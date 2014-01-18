@@ -133,7 +133,8 @@ typedef unsigned int          u32;
   // inline void operator delete (void* p, void*) noexcept {}
   #endif // RX_USE_STDLIBCXX
 
-  #include "rx-ref.h"  // RX_REF*, rx::ref_counted
+  #include "rx-ref.hh"  // RX_REF*, rx::ref_counted
+  #include "rx-func.hh" // rx::func
 #endif
 
 #undef _RX_INDIRECT_INCLUDE_
