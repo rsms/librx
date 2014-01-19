@@ -619,7 +619,7 @@ void swap(func<T> & lhs, func<T> & rhs)
 namespace std
 {
 template<typename Result, typename... Arguments, typename Allocator>
-struct uses_allocator<hi::func<Result (Arguments...)>, Allocator>
+  struct uses_allocator<rx::func<Result (Arguments...)>, Allocator>
   : std::true_type
 {
 };
