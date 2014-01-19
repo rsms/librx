@@ -101,14 +101,6 @@ typedef unsigned int          u32;
   typedef unsigned long long  u64;
 #endif
 
-#if defined(__clang__) || (defined(__GNUC__) && (__GNUC__ >= 4))
-  #define RX_I128_INTEGRAL 1
-  typedef __uint128_t         u128;
-// #else
-//   #define RX_I128_STRUCT 1
-//   typedef struct { unsigned long long high; unsigned long long low; } u128;
-#endif
-
 // libc
 #include <stddef.h>
 #include <stdlib.h>
