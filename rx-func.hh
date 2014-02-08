@@ -36,6 +36,12 @@ For more information, please refer to <http://unlicense.org/>
 #include <typeinfo>
 #include <memory>
 
+// OS X 
+#ifdef check
+#define OSX_check_was_defined
+#undef check
+#endif
+
 // include hi/target for automatic detection of RTTI and exceptions being enabled
 // #define RX_TARGET_BUILD_NO_CXX_RTTI to disable RTTI
 // #define RX_TARGET_BUILD_NO_CXX_EXCEPTIONS to disable exceptions
@@ -633,3 +639,7 @@ template<typename Result, typename... Arguments, typename Allocator>
 #undef FUNC_FORWARD
 #undef FUNC_MOVE
 #undef FUNC_CONSTEXPR
+
+#ifdef OSX_check_was_defined
+#define check(assertion)  __Check(assertion)
+#endif
