@@ -127,6 +127,7 @@ typedef unsigned int          u32;
 
   #include "rx-ref.hh"  // RX_REF*, rx::ref_counted
   #include "rx-func.hh" // rx::func
+  #include "rx-status.hh" // rx::Status
 #endif
 
 #undef _RX_INDIRECT_INCLUDE_
