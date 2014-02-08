@@ -56,7 +56,7 @@ inline std::ostream& operator<< (std::ostream& os, const Status& st) {
   if (st.ok()) {
     return os << "OK";
   } else {
-    return os << st.message();
+    return os << st.message() << " (#" << st.code() << ')';
   }
 }
 
