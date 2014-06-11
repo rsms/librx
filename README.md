@@ -76,13 +76,10 @@ T rx_atomic_cas(T* ptr, T oldval, T newval);
 - `struct rx::ref_counted_novtable` — struct members needed for a non-vtable implementation
 - `#define RX_REF_COUNT_INIT` — constant initializer for a countable `rx::refcount_t` value
 - `#define RX_REF_COUNT_INIT` — constant initializer for a constant (never moving) `rx::refcount_t` value, used for objects that should never be deallocated from reference counting.
-
 - `void rx::refcount_retain(volatile rx::refcount_t&)` — increment a counter
 - `bool rx::refcount_release(volatile rx::refcount_t&)` — decrement a counter. Returns true if the counter reached `0`.
-
 - `#define RX_REF_MIXIN(T)` — make a struct a ref object including a vtable, providing the struct's type with `T` (see example below)
 - `#define RX_REF_MIXIN_NOVTABLE(T)` — make a struct a ref object without a vtable, providing the struct's type with `T` (see example below)
-
 - `#define RX_REF_MIXIN_IMPL_VTABLE(T, O, I)` — see rx-ref.hh
 - `#define RX_REF_MIXIN_IMPL_NOVTABLE(T, O, I)` — see rx-ref.hh
 
