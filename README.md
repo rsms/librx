@@ -136,7 +136,10 @@ void foo::__dealloc(Imp* p) { delete p; } // needed b/c we have no vtable
 > Note: Make sure to use `RX_REF_MIXIN_NOVTABLE` only when there's no vtable, or the struct will have a—to rx::ref—misaligned header which will cause you all kinds of funky memory-related bugs. When in doubt, use `RX_REF_MIXIN`.
 
 
-## rx::Status
+
+## Optional "add-ons"
+
+### rx::Status
 
 A universal status/error type which has a very low cost when there's no error (`rs::Status::OK()`).
 
@@ -169,7 +172,7 @@ struct rx::Status {
 ```
 
 
-## rx::thread
+### rx::thread
 
 Platform-independent kernel thread interface
 
@@ -177,6 +180,7 @@ Platform-independent kernel thread interface
 - Requires: `rx.h`, C++11 `<thread>` implementation
 
 > TODO: Documentation
+
 
 
 ## Using rx without C++ standard library
