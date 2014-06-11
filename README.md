@@ -189,10 +189,6 @@ When used with C++11 without likning with the C++ standard library, you should d
 
     #define RX_NO_STDLIBCXX 1
 
-i.e.
-
-    c++ -DRX_NO_STDLIBCXX=1 ...
-
 Note that in this case you still need to link with libc as the `new` and `delete` keywords provided by rx in this case depend on malloc and free.
 
 
