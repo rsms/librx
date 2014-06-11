@@ -132,42 +132,31 @@ T rx_atomic_cas(T* ptr, T oldval, T newval)
 #define rx_atomic_barrier() __sync_synchronize()
 #endif
 
+typedef volatile long rx_once_t;
+#define RX_ONCE_INIT 0L
+inline static bool RX_UNUSED rx_once(rx_once_t* token) {
+  return *token == 0L && rx_atomic_cas_bool(token, 0L, 1L);
+}
+
 
 // Spinlock
 #ifdef __cplusplus
 namespace rx {
-typedef volatile i32 Spinlock;
 
-#define SB_SPINLOCK_INIT 0  // usage: Spinlock lock = SB_SPINLOCK_INIT;
-
-bool spinlock_try_lock(Spinlock& lock);
-void spinlock_lock(Spinlock& lock);
-void spinlock_unlock(Spinlock& lock);
-
-bool spinlock_try_lock(Spinlock* lock);
-void spinlock_lock(Spinlock* lock);
-void spinlock_unlock(Spinlock* lock);
+struct Spinlock {
+  void lock() noexcept { while (!try_lock()); }
+  bool try_lock() noexcept { return rx_atomic_cas_bool(&_v, 0L, 1L); }
+  void unlock() noexcept { _v = 0L; }
+private:
+  volatile long _v = 0L;
+};
 
 struct ScopedSpinlock {
-  ScopedSpinlock(Spinlock& lock) : _lock(lock) { spinlock_lock(_lock); }
-  ~ScopedSpinlock() { spinlock_unlock(_lock); }
+  ScopedSpinlock(Spinlock& lock) : _lock{lock} { _lock.lock(); }
+  ~ScopedSpinlock() { _lock.unlock(); }
 private:
   Spinlock& _lock;
 };
-
-inline bool RX_UNUSED spinlock_try_lock(Spinlock& lock) {
-  return rx_atomic_cas_bool(&lock, (i32)0, (i32)1); }
-inline void RX_UNUSED spinlock_lock(Spinlock& lock) {
-  while (!spinlock_try_lock(lock)); }
-inline void RX_UNUSED spinlock_unlock(Spinlock& lock) {
-  lock = 0; }
-
-inline bool RX_UNUSED spinlock_try_lock(Spinlock* lock) {
-  return rx_atomic_cas_bool(lock, (i32)0, (i32)1); }
-inline void RX_UNUSED spinlock_lock(Spinlock* lock) {
-  while (!spinlock_try_lock(lock)); }
-inline void RX_UNUSED spinlock_unlock(Spinlock* lock) {
-  *lock = 0; }
 
 } // namespace
 #endif // __cplusplus

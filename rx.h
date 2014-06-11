@@ -1,4 +1,5 @@
 #pragma once
+// Requires: rx-target.h rx-atomic.h rx-ref.hh rx-func.hh
 
 #define _RX_INDIRECT_INCLUDE_
 
@@ -112,7 +113,7 @@ typedef unsigned int          u32;
   // Caution: Must only include header-only libc++ headers here since we don't link with libc++
   #include <utility>
   
-  #ifndef RX_USE_STDLIBCXX
+  #if RX_NO_STDLIBCXX
   // If we don't link with libc++, we need to provide `new` and `delete`
   struct nothrow_t {};
   inline void* operator new (size_t z) { return malloc(z); }
@@ -123,11 +124,28 @@ typedef unsigned int          u32;
   inline void operator delete (void* p, const nothrow_t&) noexcept {
     free(p); }
   // inline void operator delete (void* p, void*) noexcept {}
-  #endif // RX_USE_STDLIBCXX
+  #endif // RX_NO_STDLIBCXX
+
+  namespace rx {
+    template<typename... Args> inline void pass(Args&&...) {}
+      // Iterate over variadic template args. E.g:
+      //   template<typename... Args> inline void expand(Args&&... args) {
+      //     pass( some_function(args)... );
+      //   }
+      //   expand(42, "answer", true);
+      // Is equivalent to this:
+      //   some_function(42); some_function("answer"); some_function(true);
+      //
+
+    template <typename... Tn> using varg_count = std::tuple_size<std::tuple<Tn...>>;
+      // Derive number of arguments in a varible template type
+      //   template <typename... Tn>
+      //   int foo(Tn... items) { return fixed_size_foo< varg_count<Tn...>::value >{items...};
+      //                                                 ~~~~~~~~~~~~~~~~~~~~~~~~
+  }
 
   #include "rx-ref.hh"  // RX_REF*, rx::ref_counted
   #include "rx-func.hh" // rx::func
-  #include "rx-status.hh" // rx::Status
 #endif
 
 #undef _RX_INDIRECT_INCLUDE_

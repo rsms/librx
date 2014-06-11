@@ -29,9 +29,9 @@ struct Status {
   const char* message() const;
 
   Status(const Status& other);
-  Status(Status&& other) = default;
+  Status(Status&& other);
   Status& operator=(const Status& s);
-  Status& operator=(Status&& s) = default;
+  Status& operator=(Status&& s);
 
 
 // ------------------------------------------------------------------------------------------------
@@ -44,19 +44,19 @@ private:
   const char* _state;
 };
 
-inline Status::Status() noexcept : _state(0) {} // == OK
-inline Status::Status(std::nullptr_t _) noexcept : _state(0) {} // == OK
-inline Status::~Status() { delete[] _state; }
+inline Status::Status() noexcept : _state{NULL} {} // == OK
+inline Status::Status(std::nullptr_t _) noexcept : _state{NULL} {} // == OK
+inline Status::~Status() { if (_state != NULL) delete[] _state; }
 inline Status Status::OK() { return Status(); }
-inline bool Status::ok() const { return (_state == 0); }
-inline Status::Code Status::code() const { return (_state == 0) ? 0 : _state[0]; }
-inline const char* Status::message() const { return (_state == 0) ? "" : &_state[1]; }
+inline bool Status::ok() const { return (_state == NULL); }
+inline Status::Code Status::code() const { return (_state == NULL) ? 0 : _state[0]; }
+inline const char* Status::message() const { return (_state == NULL) ? "" : &_state[1]; }
 
 inline std::ostream& operator<< (std::ostream& os, const Status& st) {
   if (st.ok()) {
     return os << "OK";
   } else {
-    return os << st.message() << " (#" << st.code() << ')';
+    return os << st.message() << " (#" << (int)st.code() << ')';
   }
 }
 
@@ -83,10 +83,10 @@ inline Status::Status(const Status& other) {
   _state = _copy_state(other._state);
 }
 
-//inline Status::Status(Status&& other) {
-//  _state = 0;
-//  std::swap(other._state, _state);
-//}
+inline Status::Status(Status&& other) {
+  _state = 0;
+  std::swap(other._state, _state);
+}
 
 inline Status::Status(Code code) {
   char* state = new char[2];
@@ -110,10 +110,11 @@ inline Status& Status::operator=(const Status& other) {
   return *this;
 }
 
-//inline void Status::operator=(Status&& other) {
-//  if (_state != other._state) {
-//    std::swap(other._state, _state);
-//  }
-//}
+inline Status& Status::operator=(Status&& other) {
+  if (_state != other._state) {
+    std::swap(other._state, _state);
+  }
+  return *this;
+}
 
 } // namespace
