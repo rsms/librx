@@ -1,5 +1,6 @@
-#pragma once
+// Copyright (c) 2012-2014 Rasmus Andersson <http://rsms.me/> See README.md for full MIT license.
 // Requires: rx-target.h rx-atomic.h rx-ref.hh rx-func.hh
+#pragma once
 
 #define _RX_INDIRECT_INCLUDE_
 

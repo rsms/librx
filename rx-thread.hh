@@ -1,3 +1,4 @@
+// Copyright (c) 2012-2014 Rasmus Andersson <http://rsms.me/> See README.md for full MIT license.
 #pragma once
 
 // Kernel threads

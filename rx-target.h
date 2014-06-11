@@ -1,3 +1,4 @@
+// Copyright (c) 2012-2014 Rasmus Andersson <http://rsms.me/> See README.md for full MIT license.
 #pragma once
 #include <stdlib.h>
 
@@ -31,22 +32,22 @@
 #if RX_TARGET_ARCH_X64
   #define RX_TARGET_ARCH_NAME     "x64"
   #define RX_TARGET_ARCH_SIZE     64
-  #define RX_TARGET_LITTLE_ENDIAN 1
+  #define RX_TARGET_ARCH_LE       1
 #elif RX_TARGET_ARCH_X86
   #define RX_TARGET_ARCH_NAME     "x86"
   #define RX_TARGET_ARCH_SIZE     32
-  #define RX_TARGET_LITTLE_ENDIAN 1
+  #define RX_TARGET_ARCH_LE       1
 #elif RX_TARGET_ARCH_ARM
   #if defined(__ARMEB__)
     #error "Unsupported target architecture: Big endian ARM"
   #endif
   #define RX_TARGET_ARCH_NAME     "arm"
   #define RX_TARGET_ARCH_SIZE     32
-  #define RX_TARGET_LITTLE_ENDIAN 1
+  #define RX_TARGET_ARCH_LE       1
 #else
   #define RX_TARGET_ARCH_NAME     "?"
   #define RX_TARGET_ARCH_SIZE     0
-  #define RX_TARGET_LITTLE_ENDIAN 0
+  #define RX_TARGET_ARCH_LE       0
 #endif
 //-- end RX_TARGET_ARCH_*
 
@@ -78,11 +79,14 @@
       defined(__NetBSD__) || defined(__OpenBSD__)
   #define RX_TARGET_OS_BSD 1
   #define RX_TARGET_OS_POSIX 1
+  #define RX_TARGET_OS_NAME "bsd"
 #elif (defined(__sun__) && defined(__svr4__)) || defined(__solaris__) || \
       defined(__CYGWIN__)
   #define RX_TARGET_OS_POSIX 1
+  #define RX_TARGET_OS_NAME "posix"
 #else
   #define RX_TARGET_OS_UNKNOWN 1
+  #define RX_TARGET_OS_NAME "?"
 #endif
 //-- end RX_TARGET_OS_*
 
