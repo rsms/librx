@@ -130,7 +130,7 @@ struct foo::Imp : rx::ref_counted_novtable {
 };
 foo::foo(const char* name) : self(new Imp{name}) {}
 const char* foo::name() const { return self->name; }
-void foo::__dealloc(Imp* p) { delete p; } // needed b/c we have no vtable
+void foo::__dealloc(foo::Imp* p) { delete p; } // needed b/c we have no vtable
 ```
 
 > Note: Make sure to use `RX_REF_MIXIN_NOVTABLE` only when there's no vtable, or the struct will have a—to rx::ref—misaligned header which will cause you all kinds of funky memory-related bugs. When in doubt, use `RX_REF_MIXIN`.
