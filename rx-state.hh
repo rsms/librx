@@ -5,87 +5,50 @@
 
 namespace rx {
 
-struct StateMachine;
-
+template <typename ID>
 struct State {
-  typedef func<void(const State& from_state)> TransFunc;
-  struct SetCmp { bool operator()(const State*, const State*) const; };
-  typedef std::set<const State*, SetCmp> NextStates;
-
-  State(const NextStates&& states);
-    // A non-terminal state which can be transitioned into `states`
-
-  State(const NextStates&& states, const TransFunc on_enter) : _states{states}, _on_enter{on_enter} {};
-  State(const NextStates&& states, const func<void()> on_enter)
-      : State{std::move(states), [on_enter](const State&){ on_enter(); }} {}
-    // A non-terminal state which can be transitioned into `states`, with trigger-on enter callback
-
+  typedef rx::func<void()> Handler;
+  typedef std::unordered_map<ID, Handler> Map;
+  rx::func<bool(const ID& from, const ID& to)> should_transition;
+  
+  State& operator()(ID new_identity) {
+    auto I = _states.find(new_identity);
+    assert(I != _states.end());
+    if (!should_transition || should_transition(_identity, new_identity)) {
+      _identity = new_identity;
+      I->second();
+    }
+    return *this;
+  }
+  
+  State(std::initializer_list<typename Map::value_type>&& il) : _states{il} {}
   State() {}
-    // A terminal state
-
-  State(const TransFunc on_enter) : State{NextStates{}, on_enter} {}
-  State(const func<void()> on_enter) : State{NextStates{}, on_enter} {}
-    // A terminal state with trigger-on enter callback
-
-  bool can_transition(const State& to) const;
-    // Returns true if there's a direct path from `this` state `to` state.
-
+  State(const State&) = delete;
+  State(State&&) = default;
+  
+  const ID& identity() const { return _identity; }
+  Handler& operator[] (const ID& identity) { return _states[identity]; }
+  
+  rx::func<void()> deferred(const ID& next_identity) {
+    return [=]() mutable {  operator()(next_identity);  };
+  }
+  
+  rx::func<void(Status)> deferred(const ID& ok_identity, const ID& error_identity) {
+    return [=](Status st) mutable {  operator()(st.ok() ? ok_identity : error_identity);  };
+  }
+  
+  rx::func<void(Status)> deferredWithStatus(const ID& next_identity, rx::Status::Code ignore_status_code=-1) {
+    return [=](Status st) mutable {
+      if (!st.ok() && st.code() != ignore_status_code) {
+        std::cerr << _identity << " error: " << st << std::endl;
+      }
+      operator()(next_identity);
+    };
+  }
+  
 private:
-  friend struct StateMachine;
-  const NextStates _states;
-  const TransFunc  _on_enter;
+  ID _identity;
+  Map _states;
 };
-
-
-struct StateMachine {
-  StateMachine(const State& initial_state);
-
-  bool transition(const State& from, const State& to);
-    // Transition `this` mutable state variable `from` state `to` state in an atomic manner.
-    // Returns true if successful.
-
-  bool transition(const State& to);
-    // Transition `this` mutable state variable from any state `to` state in an atomic manner.
-    // Returns true if successful, or false if either `can_transition(to)` is false or if another
-    // thread transitioned `this` variable before the calling thread tried.
-
-
-// ------------------------------------------------------------------------------------------------
-  static void __dealloc(State* self) {} // no delete
-  static void __retain(State*) {} // no retain
-  static bool __release(State*) { return false; } // no release
-  RX_REF_MIXIN_BODY(StateMachine, State)
-};
-
-inline State::State(const NextStates&& states) : State{std::move(states), (TransFunc)nullptr} {};
-
-inline bool State::SetCmp::operator()(const State* lhs, const State* rhs) const {
-  return (intptr_t)lhs < (intptr_t)rhs;
-}
-
-inline bool State::can_transition(const State& to) const {
-  return (_states.find(&to) != _states.end());
-}
-
-inline StateMachine::StateMachine(const State& initial_state)
-  : self{const_cast<State* volatile>(&initial_state)} {}
-
-inline bool StateMachine::transition(const State& from, const State& to) {
-  auto from_state = self; // explicit load
-  return (from_state != &from || from_state->_states.find(&to) == from_state->_states.end())
-    ? false
-    : compare_and_swap_self(from_state, &to)
-      ? (to._on_enter != nullptr) ? ({ to._on_enter(*from_state); true; }) : true
-      : false;
-}
-
-inline bool StateMachine::transition(const State& to) {
-  auto from_state = self; // explicit load
-  return (from_state->_states.find(&to) == from_state->_states.end())
-    ? false
-    : compare_and_swap_self(from_state, &to)
-      ? (to._on_enter != nullptr) ? ({ to._on_enter(*from_state); true; }) : true
-      : false;
-}
 
 } // namespace
