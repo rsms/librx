@@ -5,14 +5,14 @@ Common C and C++11 utilities used in a variety of projects.
 
 ## Usage and API reference
 
-Include the `rx.h` file where you want to use the fundational parts of rx. This includes:
+Include the `rx/rx.h` file where you want to use the fundational parts of rx. This includes:
 
 - Shorthand type definitions (i8, u32, u64, etc)
 - Includes a few common libc
-- Build target information — implemented in `rx-target.h`
-- Atomic operations, like CAS — implemented in `rx-atomic.h`
-- C++11 automatic reference-counted objects — implemented in `rx-ref.hh`
-- A memory efficient C++11 function container "rx::func" (API equivalent to std::function) — implemented in `rx-func.hh`
+- Build target information — implemented in `rx/target.h`
+- Atomic operations, like CAS — implemented in `rx/atomic.h`
+- C++11 automatic reference-counted objects — implemented in `rx/ref.hh`
+- A memory efficient C++11 function container "rx::func" (API equivalent to std::function) — implemented in `rx/func.hh`
 
 ### Shorthand type definitions
 
@@ -80,14 +80,14 @@ T rx_atomic_cas(T* ptr, T oldval, T newval);
 - `bool rx::refcount_release(volatile rx::refcount_t&)` — decrement a counter. Returns true if the counter reached `0`.
 - `#define RX_REF_MIXIN(T)` — make a struct a ref object including a vtable, providing the struct's type with `T` (see example below)
 - `#define RX_REF_MIXIN_NOVTABLE(T)` — make a struct a ref object without a vtable, providing the struct's type with `T` (see example below)
-- `#define RX_REF_MIXIN_IMPL_VTABLE(T, O, I)` — see rx-ref.hh
-- `#define RX_REF_MIXIN_IMPL_NOVTABLE(T, O, I)` — see rx-ref.hh
+- `#define RX_REF_MIXIN_IMPL_VTABLE(T, O, I)` — see rx/ref.hh
+- `#define RX_REF_MIXIN_IMPL_NOVTABLE(T, O, I)` — see rx/ref.hh
 
 Example:
 
 ```cc
 // foo.hh:
-#include "rx.h"
+#include <rx/rx.h>
 struct foo {
   foo(const char* name);
   const char* name() const;
@@ -117,7 +117,7 @@ Example without using a vtable:
 
 ```cc
 // foo.hh:
-#include "rx.h"
+#include <rx/rx.h>
 struct foo {
   foo(const char* name);
   const char* name() const;
@@ -143,8 +143,8 @@ void foo::__dealloc(foo::Imp* p) { delete p; } // needed b/c we have no vtable
 
 A universal status/error type which has a very low cost when there's no error (`rs::Status::OK()`).
 
-- Defined by: `rx-status.hh`
-- Requires: `rx.h`
+- Defined by: `rx/status.hh`
+- Requires: `rx/rx.h`
 - When representing "no error" (rx::Status::OK()) the code generated is simply a nullptr_t.
 - When representing an error, a single memory allocation is incured at construction which itself
   represents both the error code (first byte) as well as any message (remaining bytes) terminated
@@ -176,8 +176,8 @@ struct rx::Status {
 
 Platform-independent kernel thread interface
 
-- Defined by: `rx-thread.hh`
-- Requires: `rx.h`, C++11 `<thread>` implementation
+- Defined by: `rx/thread.hh`
+- Requires: `rx/rx.h`, C++11 `<thread>` implementation
 
 > TODO: Documentation
 
