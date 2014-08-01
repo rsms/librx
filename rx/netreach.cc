@@ -1,4 +1,5 @@
 // Copyright (c) 2012-2014 Rasmus Andersson <http://rsms.me/> See README.md for full MIT license.
+#include "rx.h"
 #include "netreach.hh"
 #include <iostream>
 
