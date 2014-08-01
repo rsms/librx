@@ -16,7 +16,7 @@
 #endif
 
 // Defines the host target
-#include "rx-target.h"
+#include <rx/target.h>
 
 #define RX_ABORT(fmt, ...) do { \
     fprintf(stderr, "*** " fmt " at " __FILE__ ":" RX_STR(__LINE__) "\n", \
@@ -40,6 +40,9 @@
 #endif
 #ifndef __has_builtin
   #define __has_builtin(x) 0
+#endif
+#ifndef __has_feature
+  #define __has_feature(x) 0
 #endif
 
 #if __has_attribute(always_inline)
@@ -109,7 +112,7 @@ typedef unsigned int          u32;
 #include <assert.h>
 #include <string.h>
 
-#include "rx-atomic.h"
+#include <rx/atomic.h>
 #ifdef __cplusplus
   // Caution: Must only include header-only libc++ headers here since we don't link with libc++
   #include <utility>
@@ -145,8 +148,8 @@ typedef unsigned int          u32;
       //                                                 ~~~~~~~~~~~~~~~~~~~~~~~~
   }
 
-  #include "rx-ref.hh"  // RX_REF*, rx::ref_counted
-  #include "rx-func.hh" // rx::func
+  #include <rx/ref.hh>  // RX_REF*, rx::ref_counted
+  #include <rx/func.hh> // rx::func
 #endif
 
 #undef _RX_INDIRECT_INCLUDE_

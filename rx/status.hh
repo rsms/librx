@@ -14,7 +14,7 @@ namespace rx {
 //
 
 struct Status {
-  typedef uint8_t Code;
+  using Code = uint8_t;
 
   static Status OK(); // == OK (no error)
   Status(Code);

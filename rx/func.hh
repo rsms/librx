@@ -29,9 +29,32 @@ For more information, please refer to <http://unlicense.org/>
  */
 
 #pragma once
+#include <functional>
+
+#if RX_TARGET_OS_IOS && (RX_TARGET_ARCH_SIZE == 32)
+// [bug]
+//    rx::func<void()> foo = nullptr;
+//    foo != nullptr;
+//
+// This has been observed when building for 32-bit Apple iOS w/o exceptions.
+//
+// Because of a bug in Xcode 6 beta4<= that always adds -fexceptions when compiling .mm source, we
+// can't have `defined(RX_TARGET_BUILD_NO_CXX_EXCEPTIONS)` in the above condition, or the linker
+// would bail from incompatible symbols (rx::func and std::function have the same API but generate
+// different symbols.)
+//
+// Consider expanding this condition to RX_TARGET_ARCH_ARM instead of RX_TARGET_OS_IOS is you
+// experience the same bug on other ARM platforms.
+//
+// Our fix is to use the STL "function" which has a larger memory footprint that our implementation,
+// but is known to work in the above situation.
+namespace rx {
+template <typename F> using func = std::function<F>;
+}
+#else
+
 #include <utility>
 #include <type_traits>
-#include <functional>
 #include <exception>
 #include <typeinfo>
 #include <memory>
@@ -42,7 +65,6 @@ For more information, please refer to <http://unlicense.org/>
 #undef check
 #endif
 
-// include hi/target for automatic detection of RTTI and exceptions being enabled
 // #define RX_TARGET_BUILD_NO_CXX_RTTI to disable RTTI
 // #define RX_TARGET_BUILD_NO_CXX_EXCEPTIONS to disable exceptions
 
@@ -643,3 +665,5 @@ template<typename Result, typename... Arguments, typename Allocator>
 #ifdef OSX_check_was_defined
 #define check(assertion)  __Check(assertion)
 #endif
+
+#endif /* RX_TARGET_OS_IOS */

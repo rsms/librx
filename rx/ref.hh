@@ -48,7 +48,7 @@
 
 namespace rx {
 
-typedef u32 refcount_t;
+using refcount_t = u32;
 #define RX_REF_COUNT_MEMBER volatile ::rx::refcount_t __refcount
 #define RX_REF_COUNT_INIT ((::rx::refcount_t)1)
 #define RX_REF_COUNT_CONSTANT ((::rx::refcount_t)0xffffffffu)
@@ -93,7 +93,11 @@ static inline RX_UNUSED void refcount_retain(volatile refcount_t& __refcount) {
 }
 
 static inline RX_UNUSED bool refcount_release(volatile refcount_t& __refcount) {
-  return rx_atomic_sub_fetch(&__refcount, 1) == 0;
+  volatile refcount_t v = rx_atomic_sub_fetch(&__refcount, 1);
+  return v == 0;
+  // Note: There was once a bug here with Xcode 6's clang where the following:
+  //   return rx_atomic_sub_fetch(&__refcount, 1) == 0;
+  // would cause some possible clang optimization mistake
 }
 
 

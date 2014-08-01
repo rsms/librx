@@ -26,7 +26,7 @@
 //   Foo* bar_get(); // defaults to NULL
 //   Foo* bar_set(Foo*);
 //
-#if defined(__GNUC__) /*|| __has_feature(cxx_thread_local)*/
+#if /*defined(__GNUC__) ||*/ __has_feature(cxx_thread_local)
   #define RX_THREAD_LOCAL(T, name, default_value) \
     static __thread T name##_value = default_value; \
     inline T name##_set(T p) { return name##_value = p; } \

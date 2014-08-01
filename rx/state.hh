@@ -1,14 +1,15 @@
 // Copyright (c) 2012-2014 Rasmus Andersson <http://rsms.me/> See README.md for full MIT license.
 #pragma once
-#include "rx.h"
 #include <set>
+#include <unordered_map>
+#include <initializer_list>
 
 namespace rx {
 
 template <typename ID>
 struct State {
-  typedef rx::func<void()> Handler;
-  typedef std::unordered_map<ID, Handler> Map;
+  using Handler = rx::func<void()>;
+  using Map     = std::unordered_map<ID, Handler>;
   rx::func<bool(const ID& from, const ID& to)> should_transition;
   
   State& operator()(ID new_identity) {
@@ -44,6 +45,11 @@ struct State {
       }
       operator()(next_identity);
     };
+  }
+
+  void clear() {
+    _identity.clear();
+    _states.clear();
   }
   
 private:
