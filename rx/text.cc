@@ -86,11 +86,11 @@ static inline std::string mapImp(size_t initialCapacity, I inI, I inE, F fun) {
 
 
 std::string mapF(const std::string& ins, u32(*fun)(u32)) {
-  return std::move(mapImp(ins.size(), ins.begin(), ins.end(), fun));
+  return mapImp(ins.size(), ins.begin(), ins.end(), fun);
 }
 
 std::string map(const std::string& ins, rx::func<u32(u32)> fun) {
-  return std::move(mapImp(ins.size(), ins.begin(), ins.end(), fun));
+  return mapImp(ins.size(), ins.begin(), ins.end(), fun);
 }
 
 
@@ -115,7 +115,7 @@ std::string trimImp(TrimType trimType, const std::string& s, const CharacterSet&
   } while (cs.contains(UTF8_NEXT(inI, inE)));
 
   if (trimType == TrimType::L) {
-    return std::move(std::string{inFirst, inE});
+    return std::string{inFirst, inE};
   }
 
   auto inEnd = inI;
@@ -142,21 +142,21 @@ std::string trimImp(TrimType trimType, const std::string& s, const CharacterSet&
   //    +- inFirst
 
   return (trimType == TrimType::LR) ?
-    std::move(std::string{inFirst, inEnd}) :
-    std::move(std::string{s.cbegin(), inEnd}) ;
+    std::string{inFirst, inEnd} :
+    std::string{s.cbegin(), inEnd} ;
 }
 
 
 std::string rtrim(const std::string& s, const CharacterSet& cs) {
-  return std::move(trimImp(TrimType::R, s, cs));
+  return trimImp(TrimType::R, s, cs);
 }
 
 std::string ltrim(const std::string& s, const CharacterSet& cs) {
-  return std::move(trimImp(TrimType::L, s, cs));
+  return trimImp(TrimType::L, s, cs);
 }
 
 std::string trim(const std::string& s, const CharacterSet& cs) {
-  return std::move(trimImp(TrimType::LR, s, cs));
+  return trimImp(TrimType::LR, s, cs);
 }
 
 
