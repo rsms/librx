@@ -3,6 +3,7 @@
 #include <set>
 #include <unordered_map>
 #include <initializer_list>
+#include <iostream>
 
 namespace rx {
 
